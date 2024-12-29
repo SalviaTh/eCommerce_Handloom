@@ -127,3 +127,121 @@
 .cart-item p {
   flex-grow: 1;
 }
+/* Button styles */
+button {
+  background-color: #e63946;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #d62828;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+button:disabled {
+  background-color: #9e9e9e;
+  cursor: not-allowed;
+}
+
+/* Input styles */
+input[type="text"],
+input[type="email"],
+select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+select:focus {
+  border-color: #e63946;
+  box-shadow: 0 0 5px rgba(230, 57, 70, 0.5);
+}
+
+/* Form labels */
+label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Radio buttons and checkboxes */
+.radio-group label {
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.radio-group input {
+  margin-right: 5px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.checkbox-group input {
+  margin-right: 5px;
+}
+
+/* Error message styles */
+.error-message {
+  color: #e63946;
+  font-size: 12px;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+
+/* Form container */
+form {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Cart totals */
+.cart-totals {
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+.cart-totals .total {
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  select {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  label {
+    font-size: 12px;
+  }
+}

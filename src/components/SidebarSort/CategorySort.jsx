@@ -132,7 +132,7 @@ const CategorySort = React.memo(() => {
                       ).map((product) => (
                         <div
                           className="group shadow-md hover:shadow-lg border border-gray-400 sm:p-3 p-2 rounded-md"
-                          key={product._id}
+                          key={product._id}x
                         >
                           <div className="relative">
                             {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}

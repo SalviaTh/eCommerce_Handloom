@@ -111,3 +111,19 @@
     padding: 8px 12px; 
   }
 }
+.cart-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.cart-item img {
+  width: 80px;
+  height: 80px;
+  margin-right: 15px;
+}
+
+.cart-item p {
+  flex-grow: 1;
+}

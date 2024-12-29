@@ -4,7 +4,7 @@ import Footer from "../Footer/Footer";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShopContext } from "../Context/ShopContext";
-import { toast } from "react-toastify";
+import { alert } from "react-alertify";
 import Swal from "sweetalert2";
 import { Radio, Group } from "@mantine/core";
 import { Checkbox } from "@mantine/core";
@@ -59,7 +59,11 @@ const Checkout = () => {
       behavior: "smooth",
     });
   }, []);
-
+  
+  useEffect(() => {
+    localStorage.setItem("checkoutItem", JSON.stringify(cartItems));
+  }, [cartItems]);
+  
   useEffect(() => {
     const savedAddress = localStorage.getItem("addressInfo");
     if (savedAddress) {
@@ -118,9 +122,20 @@ const Checkout = () => {
       document.body.appendChild(script);
     });
   }
+  const [isAddressVerified, setIsAddressVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+
   const paymentHandler = async () => {
+    if(!isAddressVerified){
+      Swal.fire("Error","Please Verify your address before processing","error");
+      return;
+    }
+
     if (paymentMethod === "razorpay") {
       // navigate("/razorpay-payment");
+      // console.log("Proceed with Razorpay payment");
+      navigate("/razorpay-payment");
     }
     if (paymentMethod === "cash") {
       alertOk();
@@ -179,7 +194,7 @@ const Checkout = () => {
           razorpay_signature: body.razorpay_signature,
         });
         if (data.msg === "success") {
-          toast.success(`Payment Success with Payment ID: ${data.paymentId}`);
+          alert.success(`Payment Success with Payment ID: ${data.paymentId}`);
           localStorage.removeItem("cartItems");
           getInitialCartItems();
           navigate("/myorder");
@@ -228,11 +243,11 @@ const Checkout = () => {
   // };
   const getTotal = () => {
     let total = 0;
-    // const items = cartItems || checkoutItem;
-    checkoutItem?.forEach((i) => {
-      total += i.discountedPrice;
-    });
-
+    if (checkoutItem && checkoutItem?.length) {
+      checkoutItem.map((i) => {
+        total = total + i.discountedPrice;
+      });
+    }
     return total;
   };
   // console.log("cartItems:", cartItems);
@@ -246,167 +261,127 @@ const Checkout = () => {
   }, []);
 
   const handlePayment = () => {
+    if(!isAddressVerified){
+      Swal.fire("Error","Please Verify your address before processing","error");
+      return;
+    }
     navigate("/orderconfirm");
+  };
+  const saveInfo = () => {
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Your information has been saved",
+      showConfirmButton: true,
+      timer: 1500,
+    });
   };
 
   return (
     <div className="bg-white dark:bg-gray-900 duration-200 overflow-hidden pt-16">
       <Navbar />
-      <div className="text-2xl overflow-hidden rounded-3xl min-h-[550px] sm:min-h-[650px] flex flex-col pt-5 gap-y-4">
-        <div className="container  mx-auto px-4">
+      <div className="text-2xl overflow-hidden rounded-3xl min-h-[550px]  sm:min-h-[650px] flex flex-col pt-5 gap-y-4">
+        <div className="container  mx-auto px-4 ">
           <h4 className="text-[18px] underline">Address Information</h4>
         </div>
 
         <div className="sm:flex gap-4 sm:px-4 px-2 flex-col sm:flex-row">
-          <div className="container sm:mb-4 sm:mt-2 border border-gray-300 w-full sm:w-[48%] p-4 rounded-lg">
-            {!isAddressSubmitted ? (
-              // Display Address Input Fields if not submitted
-              <div>
-                <div className="flex flex-col mb-4">
-                  <label className="text-sm sm:text-[16px]">Full Name</label>
-                  <input
-                    className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
-                    type="text"
-                    name="fullname"
-                    placeholder="Enter full name"
-                    value={fullname}
-                    onChange={(e) => setFullName(e.target.value)}
-                  />
-                </div>
-                <div className="flex flex-col mb-4">
-                  <label className="text-sm sm:text-[16px]">Full Address</label>
-                  <input
-                    className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
-                    type="text"
-                    name="address"
-                    placeholder="Enter full address"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                  />
-                </div>
-                <div className="flex flex-col mb-4">
-                  <label className="text-sm sm:text-[16px]">Phone Number</label>
-                  <input
-                    className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
-                    type="text"
-                    name="phone number"
-                    placeholder="Enter phone number"
-                    value={phonenumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                  />
-                </div>
-                {/* <div className="flex flex-col mb-4">
-                  <label className="text-sm sm:text-[16px]">
-                    Email Address
-                  </label>
-                  <input
-                    className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
-                    type="email"
-                    name="email address"
-                    placeholder="Enter email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div> */}
-                <div className="flex flex-col mb-4">
-                  <label className="text-sm sm:text-[16px]">District</label>
-                  <select
-                    onChange={(e) => setDistrict(e.target.value)}
-                    id="district"
-                    className="rounded-md w-full h-[40px] border border-gray-300 outline-none sm:text-[16px] text-[14px]"
-                  >
-                    <option value="district">Select District</option>
-                    {districtPincode.map((s, i) => (
-                      <option key={i} value={s.district}>
-                        {s.district}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex flex-col mb-4">
-                  <label className="text-sm sm:text-[16px]">Pincode</label>
-                  <input
-                    className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
-                    type="text"
-                    placeholder="Enter Pincode"
-                    value={pincode}
-                    maxLength={6}
-                    onChange={(e) => setPincode(e.target.value)}
-                    name="pincode"
-                    required
-                  />
-                </div>
-                <div className="flex flex-col mb-4">
-                  <label className="text-sm sm:text-[16px]">State</label>
-                  <input
-                    className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
-                    type="text"
-                    name="state"
-                    placeholder="Enter state"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="flex items-center gap-2 text-sm sm:text-[16px]">
-                  <Checkbox size="xs" defaultChecked color="red" />
-                  <label htmlFor="info">Save the information</label>
-                </div>
-                <button
-                  type="button"
-                  onClick={saveAddress}
-                  className="w-full sm:w-[120px] sm:h-[50px] mt-4 outline-none border-none bg-red-500 text-white sm:text-[16px] text-[14px] text-center cursor-pointer rounded-md"
-                >
-                  Save Address
-                </button>
-              </div>
-            ) : (
-              // Display Address with Edit Option if already submitted
-              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-300">
-                <div className="mb-4 space-y-2">
-                  <p className="text-sm sm:text-[16px] font-semibold text-gray-700">
-                    <span className="font-normal text-gray-500">
-                      Full Name:
-                    </span>{" "}
-                    {fullname}
-                  </p>
-                  <p className="text-sm sm:text-[16px] font-semibold text-gray-700">
-                    <span className="font-normal text-gray-500">Address:</span>{" "}
-                    {address}
-                  </p>
-                  <p className="text-sm sm:text-[16px] font-semibold text-gray-700">
-                    <span className="font-normal text-gray-500">
-                      Phone Number:
-                    </span>{" "}
-                    {phonenumber}
-                  </p>
-                  {/* <p className="text-sm sm:text-[16px] font-semibold text-gray-700">
-                    <span className="font-normal text-gray-500">Email:</span>{" "}
-                    {email}
-                  </p> */}
-                  <p className="text-sm sm:text-[16px] font-semibold text-gray-700">
-                    <span className="font-normal text-gray-500">District:</span>{" "}
-                    {district}
-                  </p>
-                  <p className="text-sm sm:text-[16px] font-semibold text-gray-700">
-                    <span className="font-normal text-gray-500">Pincode:</span>{" "}
-                    {pincode}
-                  </p>
-                  <p className="text-sm sm:text-[16px] font-semibold text-gray-700">
-                    <span className="font-normal text-gray-500">State:</span>{" "}
-                    {state}
-                  </p>
-                </div>
+          <div className="container sm:mb-4 sm:mt-2 border  border-gray-300 w-full sm:w-[48%] p-4 rounded-lg">
+            <div className="flex flex-col mb-4">
+              <label className="text-sm sm:text-[16px]">Full Name</label>
+              <input
+                className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
+                type="text"
+                name="fullname"
+                placeholder="Enter full name"
+                value={fullname}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+            </div>
 
-                <button
-                  type="button"
-                  onClick={handleEditAddress}
-                  className="mt-4 text-red-500 text-sm sm:text-[16px] font-semibold underline hover:text-red-700 transition-all duration-200"
-                >
-                  Edit Address
-                </button>
-              </div>
-            )}
+            <div className="flex flex-col mb-4">
+              <label className="text-sm sm:text-[16px]">Full Address</label>
+              <input
+                className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
+                type="text"
+                name="address"
+                placeholder="Enter full address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-col mb-4">
+              <label className="text-sm sm:text-[16px]">Phone Number</label>
+              <input
+                className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
+                type="text"
+                name="phone number"
+                placeholder="Enter phone number"
+                value={phonenumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-col mb-4">
+              <label className="text-sm sm:text-[16px]">Email Address</label>
+              <input
+                className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
+                type="email"
+                name="email address"
+                placeholder="Enter email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-col mb-4">
+              <label className="text-sm sm:text-[16px]">District</label>
+              <select
+                onChange={(e) => setDistrict(e.target.value)}
+                id="district"
+                className="rounded-md w-full h-[40px] border border-gray-300 outline-none sm:text-[16px] text-[14px]"
+              >
+                <option value="district">Select District</option>
+                {districtPincode.map((s, i) => (
+                  <option key={i} value={s.district}>
+                    {s.district}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col mb-4">
+              <label className="text-sm sm:text-[16px]">Pincode</label>
+              <input
+                className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
+                type="text"
+                placeholder="Enter Pincode"
+                value={pincode}
+                maxLength={6}
+                onChange={(e) => setPincode(e.target.value)}
+                name="pincode"
+                required
+              />
+            </div>
+
+            <div className="flex flex-col mb-4">
+              <label className="text-sm sm:text-[16px]">State</label>
+              <input
+                className="rounded-md w-full h-[40px] text-black indent-2 border border-gray-300 outline-none sm:text-[16px] text-[14px]"
+                type="text"
+                name="state"
+                placeholder="Enter state"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="flex items-center gap-2 text-sm sm:text-[16px]">
+              <Checkbox size="xs" defaultChecked color="red" />
+              <label htmlFor="info">Save the information</label>
+            </div>
           </div>
 
           <div className="container mb-4 w-full  mt-4 sm:w-[48%]  p-4 border  border-gray-300 drop-shadow-lg rounded-lg">
@@ -529,6 +504,7 @@ const Checkout = () => {
                   onClick={handlePayment}
                   type="button"
                   className="w-[120px] sm:h-[50px] mt-4 outline-none border-none bg-red-500 text-white sm:text-[16px] text-[14px] text-center cursor-pointer rounded-md"
+                  //disabled={!isAddressVerified}
                 >
                   PAY NOW
                 </button>

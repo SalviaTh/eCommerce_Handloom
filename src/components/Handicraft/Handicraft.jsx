@@ -19,7 +19,6 @@ const Handicraft = () => {
   });
   const handicraftLists = handicraftData?.products || [];
 
-  // category subcategory fetching
   const { data: subCategoryData = {} } = useQuery({
     queryKey: ["subcategorylist"],
     queryFn: fetchSubCategory,
@@ -88,7 +87,7 @@ const Handicraft = () => {
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
-                {subcategory.subCategoryName}
+                {subcategory?.subCategoryName}
               </button>
             ))}
           </Box>
@@ -97,41 +96,45 @@ const Handicraft = () => {
 
       {/* Scrollable Product List */}
       <div className="overflow-x-scroll scrollbar-hide flex space-x-4 pb-6 scroll-smooth">
-        <div className="flex sm:gap-5 gap-4 ">
+        <div className="flex sm:gap-5 gap-3">
           {filteredHandicraftList?.length > 0 ? (
             filteredHandicraftList.map((item) => (
               <div
                 key={item._id}
-                className="bg-gray-100 drop-shadow-md sm:h-[350px] sm:w-[250px] h-[250px] w-[180px] rounded-lg flex flex-col items-center"
+                className="bg-gray-100 drop-shadow-md sm:h-[350px] sm:w-[250px] h-auto w-[180px] rounded-lg flex flex-col items-center p-3"
               >
-                {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+                {/* Product Image */}
                 <img
                   onClick={() => navigate(`/product/${item._id}`)}
                   src={`${
                     CloudinaryConfig.CLOUDINARY_URL
                   }/image/upload/${item?.image_id?.[0]?.replace(/"/g, "")}`}
                   alt={item.name}
-                  className="sm:w-52 sm:h-56 w-[150px] h-[160px] object-fit m-auto"
+                  className="sm:w-52 sm:h-52 w-[150px] h-[160px] object-cover rounded-md cursor-pointer"
                 />
-                <div className="flex justify-between sm:pb-2 p-1 gap-1 sm:gap-2 sm:pl-4 pl-3 sm:pr-3 w-full">
-                  <div className="sm:text-[16px] text-[11px] text-black">
-                    <p>{item.name}</p>
-                    <div className="flex items-center">
-                      <p className="text-[13px] sm:text-[15px] pr-2 line-through opacity-65">
+
+                {/* Product Details */}
+                <div className="flex flex-col sm:pb-2 pt-2 gap-2  sm:gap-3 w-full">
+                  <div className="sm:text-[16px] pl-2 text-[12px] text-black flex-1">
+                    <p className="truncate font-medium">{item.name}</p>
+                    <div className="flex items-center justify-start gap-2">
+                      <p className="text-[13px] sm:text-[15px] line-through text-gray-500">
                         ₹{item.price}
                       </p>
-                      <p className="text-red-500 pr-1 sm:text-[16px] text-[14px]">
+                      <p className="text-red-500 text-[15px] sm:text-[18px] font-semibold">
                         ₹{item.discountedPrice}
                       </p>
+                      <p className="text-emerald-500 sm:text-[13px] text-[11px]">
+                        ({item.discount}% OFF)
+                      </p>
                     </div>
-                    <p className="text-emerald-500 sm:text-[13px] text-[11px]">
-                      ({item.discount}% OFF)
-                    </p>
                   </div>
+
+                  {/* View Button */}
                   <button
                     onClick={() => navigate(`/product/${item._id}`)}
                     type="button"
-                    className="bg-red-600 hover:bg-red-500 sm:text-[16px] text-[10px] text-center pt-[3px] sm:w-[80px] sm:h-[38px] w-[45px] h-6 text-white rounded-md"
+                    className="bg-red-500 hover:bg-red-600 sm:text-[18px] text-[14px] text-center py-[6px] w-full  sm:h-[38px] h-[32px] text-white rounded-md"
                   >
                     View
                   </button>

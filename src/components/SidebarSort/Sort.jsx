@@ -32,7 +32,6 @@ const Sort = ({
     queryFn: () => getCollectionName(categoryId, subcategoryId),
     enabled: !!categoryId,
   });
-  console.log("colllectionsData", collectionData);
 
   return (
     <div className="bg-white p-2 sm:min-h-[calc(100vh-120px)] border border-black">

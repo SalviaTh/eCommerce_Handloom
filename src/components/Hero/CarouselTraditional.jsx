@@ -27,7 +27,7 @@ const CarouselTraditional = () => {
         url: "/carousel",
         method: "GET",
       });
-      console.log(res);
+      // console.log(res);
       setCarouselData(res.data.list);
     } catch (error) {
       console.log(error);

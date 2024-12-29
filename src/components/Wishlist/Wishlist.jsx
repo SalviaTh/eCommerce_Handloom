@@ -68,6 +68,7 @@ const Wishlist = () => {
                 key={p._id}
               >
                 <div className="relative">
+                  {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
                   <img
                     onClick={() => {
                       navigate(`/product/${p._id}`);
@@ -76,7 +77,7 @@ const Wishlist = () => {
                       CloudinaryConfig.CLOUDINARY_URL
                     }/image/upload/${p?.image_id[0]?.replace(/"/g, "")}`}
                     alt={p.name}
-                    className="sm:h-[190px] sm:w-[250px] w-[150px] h-[170px] object-fit rounded-md"
+                    className="sm:ml-4 sm:w-52 sm:h-52 w-[150px] h-[170px] object-cover rounded-md"
                   />
                   <button
                     type="button"

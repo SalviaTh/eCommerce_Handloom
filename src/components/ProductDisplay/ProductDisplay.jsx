@@ -11,6 +11,7 @@ import Reviews from "../Reviews/Reviews";
 import RelatedProduct from "../RelatedProducts/RelatedProduct.jsx";
 import LogoLoading from "../../Pages/LogoLoading.jsx";
 import { useQuery } from "@tanstack/react-query";
+import ChatBox from "../Chat/ChatBox.jsx";
 
 const ProductDisplay = (props) => {
   const { product } = props;
@@ -82,9 +83,9 @@ const ProductDisplay = (props) => {
                     <div className="flex flex-col sm:flex-row sm:items-start items-center gap-4">
                       {/* Main Image Section */}
                       <div className="flex justify-center w-full sm:w-[520px] ">
-                        <div className="w-full sm:h-[520px] h-[400px]">
+                        <div className="w-full pr-3 sm:h-[520px] h-[400px]">
                           <img
-                            className="w-full p-3 h-full object-contain border rounded-md"
+                            className="w-full p-3 h-full object-cover  rounded-md"
                             src={
                               mainImg ||
                               `${
@@ -213,6 +214,7 @@ const ProductDisplay = (props) => {
           </div>
         )
       )}
+      <ChatBox />
     </>
   );
 };

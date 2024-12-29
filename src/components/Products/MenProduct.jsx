@@ -16,7 +16,7 @@ export default function MenProduct({ filteredMenProductList }) {
 
   return (
     <div className="mb-6 sm:mt-2 p-3">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 p-2">
         {sortedProductList?.map((p) => {
           return (
             <div
@@ -31,7 +31,7 @@ export default function MenProduct({ filteredMenProductList }) {
                     CloudinaryConfig.CLOUDINARY_URL
                   }/image/upload/${p?.image_id[0]?.replace(/"/g, "")}`}
                   alt=""
-                  className="sm:h-[190px] sm:w-[250px] w-[150px] h-[170px] object-fit rounded-md"
+                  className="sm:h-52 sm:w-[240px] w-[150px] h-[170px] object-cover rounded-md"
                 />
                 <button
                   onClick={(e) => {

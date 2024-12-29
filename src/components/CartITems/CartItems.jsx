@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
-import { FaTimes } from "react-icons/fa"; // Importing FaTimes for remove icon
+import { FaTimes } from "react-icons/fa";
 import { ShopContext } from "../Context/ShopContext";
 import { useNavigate } from "react-router-dom";
 import { CloudinaryConfig } from "../../../Cloudinary";
@@ -13,7 +13,7 @@ const CartItem = ({ item, substractQuantity, addToCart, removeFromCart }) => (
         src={`${
           CloudinaryConfig.CLOUDINARY_URL
         }/image/upload/${item?.image_id[0]?.replace(/"/g, "")}`}
-        alt={item.name}
+        alt=""
       />
     </div>
 
@@ -73,8 +73,6 @@ const CartItem = ({ item, substractQuantity, addToCart, removeFromCart }) => (
       <h3 className="font-semibold text-black ">
         SubTotal: ₹ {item.discountedPrice * item.quantity}
       </h3>
-      {/* <div className="flex justify-between items-center mt-4"> */}
-      {/* </div> */}
     </div>
   </div>
 );

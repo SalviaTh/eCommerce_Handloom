@@ -4,9 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchProductWithComments } from "../../BaseURL/Product";
 import { useParams } from "react-router-dom";
 import { Rating } from "@mantine/core";
+import { Button, Group, Text, Collapse, Box } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import ReviewSubmit from "./ReviewSubmit";
 
 const Reviews = () => {
   const { productId } = useParams();
+  const [opened, { toggle }] = useDisclosure(false);
   const { data: reviewData = {} } = useQuery({
     queryKey: ["review", productId],
     queryFn: () => fetchProductWithComments(productId),
@@ -14,20 +18,38 @@ const Reviews = () => {
 
   const commentRatings = reviewData.commentRating || [];
 
-  // Ensure the filter works properly by checking if the productId exists
   const filteredComments = commentRatings?.filter(
     (comment) => comment?.productId?._id === productId
   );
 
   return (
     <div className="w-full p-4 bg-gray-100">
-      <h2 className="sm:text-2xl font-bold text-gray-800 text-center mb-6">
+      <h2 className="sm:text-2xl font-bold text-gray-800 text-center mb-6 ">
         Customer Reviews
       </h2>
-      <div>
+      <Box maw={800} mx="auto">
+        <Group justify="center" mb={5}>
+          <div className="flex justify-center">
+            <Button
+              onClick={toggle}
+              type="button"
+              className="px-6 py-2 bg-red-500 text-white rounded-md shadow-md hover:bg-red-400 transition-all"
+            >
+              Write a Review
+            </Button>
+          </div>
+        </Group>
+
+        <Collapse in={opened}>
+          <Text>
+            <ReviewSubmit />
+          </Text>
+        </Collapse>
+      </Box>
+      <div className="mt-4">
         {(filteredComments?.length || 0) === 0 ? (
-          <div className="flex flex-col items-center py-10 bg-white shadow-md rounded-lg border border-gray-200">
-            <h3 className="text-gray-600 text-lg font-medium">
+          <div className="flex flex-col items-center py-6 bg-white shadow-md rounded-lg border border-gray-200">
+            <h3 className="text-gray-600 w-full text-center sm:text-lg text-[15px] ">
               No reviews yet
             </h3>
             <p className="text-gray-500 mt-2 text-sm text-center max-w-md">
@@ -35,12 +57,6 @@ const Reviews = () => {
               first to share your thoughts and help others make informed
               decisions.
             </p>
-            <button
-              type="button"
-              className="mt-4 px-6 py-2 bg-red-400 text-white rounded-md hover:bg-red-500 transition-all"
-            >
-              Write a Review
-            </button>
           </div>
         ) : (
           <div className="space-y-4">

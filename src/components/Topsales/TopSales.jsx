@@ -87,31 +87,31 @@ const TopSales = () => {
 
   return (
     <div className="mt-2 drop-shadow-md sm:m-3">
-      <div className="overflow-hidden rounded-xl sm:h-[440px] h-[320px] ">
+      <div className="overflow-hidden rounded-xl sm:h-[440px] h-[340px] ">
         <div className="container pb-2 ml-0 pr-0 sm:pb-0">
-          <h1 className="gap-4 flex justify-start items-start text-xl font-semibold text-black   p-2">
+          <h1 className="gap-4 flex justify-start items-start text-xl font-semibold text-black p-2">
             Top sales
             <p className="text-[20px] text-red-500">Above {minDiscount}% </p>
           </h1>
-          <div className="sm:m-auto sm:p-3 sm:w-auto pr-8 w-[400px]">
+          <div className="sm:m-auto sm:p-3 sm:w-auto pr-8 w-[420px]">
             <Slider {...settings}>
               {filterItems?.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-gray-100 sm:p-2 drop-shadow-md rounded-md sm:w-[500px] sm:h-[330px] w-[300px] h-[240px]"
+                  className="bg-gray-100 sm:p-3 pt-2 drop-shadow-md rounded-md sm:w-[250px] sm:h-[340px] h-[270px] w-[180px] "
                 >
                   <div>
                     {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
                     <img
                       onClick={() => navigate(`/product/${item._id}`)}
-                      className="sm:w-52 sm:h-52 w-[150px] h-[150px] object-fit m-auto p-2 cursor-pointer"
+                      className="sm:w-52 sm:h-52 w-[150px] h-[170px] object-cover m-auto rounded-md "
                       src={`${
                         CloudinaryConfig.CLOUDINARY_URL
                       }/image/upload/${item?.image_id[0]?.replace(/"/g, "")}`}
                       alt=""
                     />
                   </div>
-                  <div className="flex sm:pl-8 pl-4 pr-2 w-full">
+                  <div className="flex sm:pl-8 sm:pt-2 pl-4 pr-2 pt-2 w-full">
                     <div className="sm:text-[16px] text-[11px] text-black">
                       <p>{item.name}</p>
                       <div className="flex items-center gap-2 py-2">

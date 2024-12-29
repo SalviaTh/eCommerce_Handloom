@@ -38,7 +38,7 @@ const Footer = () => {
                     />
                     {footer?.title}
                   </a>
-                  <p className="text-gray-600 sm:text-[18px] text-[13px] pt-3">
+                  <p className="text-gray-600 sm:text-[18px] text-[16px] pt-3">
                     {footer?.description}
                   </p>
                 </div>
@@ -46,19 +46,33 @@ const Footer = () => {
             })}
           </div>
           {/* Footer links */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4">
             {footerdatasub?.map((data) => (
               <div key={data._id}>
                 <div>
                   <h1 className="text-xl font-bold sm:text-left mb-3 dark:text-white">
                     {data.name}
                   </h1>
-                  <ul>
+                  <ul className="text-xl">
                     {data?.footerlink?.map((link) => (
                       <li key={link._id}>
                         <Link
-                          to={link.name === "About Us" ? "/about" : "/"}
-                          className="text-gray-600  sm:text-[16px] text-[14px] hover:text-red-500 cursor-pointer duration-300"
+                          to={
+                            link.name === "About Us"
+                              ? "/about"
+                              : link.name === "Privacy Policy"
+                              ? "/privacypolicy"
+                              : link.name === "Term and Conditions"
+                              ? "/tac"
+                              : link.name === "Cancellation & Refund"
+                              ? "/cancel"
+                              : link.name === "Shipping & Delivery"
+                              ? "/shipping"
+                              : link.name === "Contact Us"
+                              ? "/contact"
+                              : "/"
+                          }
+                          className="text-gray-600 sm:text-[16px] text-[14px] hover:text-red-500 cursor-pointer duration-300"
                         >
                           {link?.name}
                         </Link>

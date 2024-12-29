@@ -67,7 +67,7 @@ const Products = () => {
 
   return (
     <div className="overflow-hidden rounded-3xl min-h-[500px] sm:min-h-[650px] flex items-center flex-col pt-6 gap-y-3.5">
-      <div className="">
+      <div>
         <Heading title="Latest Products" subtitle={"Explore our products"} />
         <AllProductList
           AllProduct={productList}
@@ -76,7 +76,7 @@ const Products = () => {
         />
       </div>
 
-      <div className="">
+      <div>
         <Heading title="Men Products" subtitle={"Explore our men products"} />
         <MenProduct
           filteredMenProductList={filteredMenProductList}
@@ -85,7 +85,7 @@ const Products = () => {
         />
       </div>
 
-      <div className="">
+      <div>
         <Heading
           title="Women Products"
           subtitle={"Explore our women products"}

@@ -7,21 +7,53 @@ import { CloudinaryConfig } from "../../../Cloudinary";
 import { FaHeart } from "react-icons/fa";
 import { Rating, ScrollArea, Skeleton } from "@mantine/core";
 import Sort from "../SidebarSort/Sort";
-import ChatBox from "../Chat/ChatBox";
 
 import { useWishlist } from "../../hooks/useWistlist";
+import { useQuery } from "@tanstack/react-query";
+const getPriceRanges = async () => {
+  const res = await Axios.get("/pricerange/getpriceranges");
+  return res.data;
+};
 
+const getFilteredPrice = async (category, priceRange) => {
+  const url = `/product/filterbyprice/${category}/${priceRange}`;
+  const res = await Axios.get(url);
+  return res.data.products;
+};
 const SearchResults = () => {
+  const { categoryId, subcategoryId } = useParams();
   const navigate = useNavigate();
+  const [selectPriceRange, setSelectPriceRange] = useState("");
   const { searchTerm } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage = 4;
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
   const { isInWishlists, toggleWishlist } = useWishlist();
+  //
+  const {
+    data: prices,
+    isLoading: priceLoading,
+    isError: priceError,
+  } = useQuery({
+    queryKey: ["priceranges"],
+    queryFn: getPriceRanges,
+    staleTime: 1000 * 60 * 5,
+  });
 
+  const { data: filteredProduct = [] } = useQuery({
+    queryKey: ["filteredPrices", categoryId, selectPriceRange],
+    queryFn: () => getFilteredPrice(categoryId, selectPriceRange),
+    enabled: selectPriceRange !== "",
+    staleTime: 1000 * 60 * 5,
+  });
+  const handleSelectPrice = (priceRange) => {
+    setSelectPriceRange(priceRange);
+    setCurrentPage(1);
+  };
+  //
   const fetchProducts = async () => {
     if (!searchTerm) return;
 
@@ -104,7 +136,14 @@ const SearchResults = () => {
       <Navbar />
       <div className="flex flex-col sm:flex-row gap-3 p-4 min-h-[550px] sm:min-h-[650px]">
         <div className="w-full sm:w-[280px]">
-          <Sort />
+          <Sort
+            prices={prices}
+            handleSelectPrice={handleSelectPrice}
+            isError={priceError}
+            isLoading={priceLoading}
+            selectPriceRange={selectPriceRange}
+            filteredProduct={filteredProduct}
+          />
         </div>
         <div className="w-full p-2">
           {loading ? (
@@ -140,14 +179,14 @@ const SearchResults = () => {
                               ""
                             )}`}
                             alt={product.name}
-                            className="sm:h-[190px] sm:w-[250px] w-[150px] h-[170px] object-fit rounded-md"
+                            className="sm:h-52 sm:w-[240px] w-[150px] h-[170px] object-cover  rounded-md"
                           />
                           <button
                             onClick={(e) => {
                               toggleWishlist(product._id);
                             }}
                             type="button"
-                            className="absolute top-2 right-2 bg-slate-50 p-[5px] sm:p-[8px] rounded-full"
+                            className="absolute top-2 right-3 bg-slate-50 p-[5px] sm:p-[8px] rounded-full"
                           >
                             <FaHeart
                               className={
@@ -274,7 +313,7 @@ const SearchResults = () => {
                 </div>
               ) : (
                 <div className="flex items-center justify-center w-full min-h-[calc(100vh-200px)] sm:p-36 sm:pt-10 pb-20">
-                  <div className="flex flex-col items-center bg-white border border-gray-300 rounded-lg p-6 sm:p-8 shadow-lg w-full max-w-3xl text-center">
+                  <div className="flex flex-col items-center bg-white  p-6 sm:p-8 w-full max-w-3xl text-center">
                     <img
                       src="/nofound.png"
                       alt="No products found"
@@ -289,9 +328,6 @@ const SearchResults = () => {
                     </p>
                   </div>
                 </div>
-                // <div className="text-center">
-                //   No Products found for &apos;{searchTerm}&apos;
-                // </div>
               )}
             </>
           )}

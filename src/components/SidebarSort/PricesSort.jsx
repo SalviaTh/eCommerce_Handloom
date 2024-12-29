@@ -11,7 +11,7 @@ const PricesSort = ({
   isLoading,
   isError,
 }) => {
-  const { categoryId } = useParams();
+  const { categoryId, subcategoryId } = useParams();
 
   const [isPricesOpen, setIsPricesOpen] = useState(false);
 

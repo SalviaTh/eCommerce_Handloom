@@ -29,7 +29,7 @@ export default function AllProductList({ AllProduct }) {
                     CloudinaryConfig.CLOUDINARY_URL
                   }/image/upload/${p?.image_id[0]?.replace(/"/g, "")}`}
                   alt={p.name}
-                  className="sm:h-[190px] sm:w-[250px] w-[150px] h-[170px] object-fit rounded-md"
+                  className="sm:h-52 sm:w-[240px] w-[150px] h-[170px] object-cover rounded-md"
                 />
                 <button
                   onClick={() => toggleWishlist(p._id)}

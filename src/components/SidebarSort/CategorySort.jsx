@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CloudinaryConfig } from "../../../Cloudinary";
-import { Rating, ScrollArea, Skeleton } from "@mantine/core";
+import { Rating, Skeleton } from "@mantine/core";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
 import { useWishlist } from "../../hooks/useWistlist";
@@ -12,14 +12,18 @@ import Footer from "../Footer/Footer";
 import { fetchProducts } from "../../BaseURL/Product";
 import { Axios } from "../../../api";
 
-// Price range fetching function...
 const getPriceRanges = async () => {
   const res = await Axios.get("/pricerange/getpriceranges");
   return res.data;
 };
 
-const getFilteredPrice = async (category, priceRange) => {
-  const url = `/product/filterbyprice/${category}/${priceRange}`;
+// const getFilteredPrice = async (subcategory, priceRange) => {
+//   const url = `/product/filterbyprice/${subcategory}/${priceRange}`;
+//   const res = await Axios.get(url);
+//   return res.data.products;
+// };
+const getFilteredPrice = async (categoryId, subcategoryId, priceRange) => {
+  const url = `/product/filterbyprice/${categoryId}/${subcategoryId}/${priceRange}`;
   const res = await Axios.get(url);
   return res.data.products;
 };
@@ -29,7 +33,7 @@ const CategorySort = React.memo(() => {
   const navigate = useNavigate();
   const [selectPriceRange, setSelectPriceRange] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 1;
+  const itemsPerPage = 4;
 
   const {
     data: prices,
@@ -42,9 +46,10 @@ const CategorySort = React.memo(() => {
   });
 
   const { data: filteredProduct = [] } = useQuery({
-    queryKey: ["filteredPrices", categoryId, selectPriceRange],
-    queryFn: () => getFilteredPrice(categoryId, selectPriceRange),
-    enabled: selectPriceRange !== "",
+    queryKey: ["filteredPrices", categoryId, subcategoryId, selectPriceRange],
+    queryFn: () =>
+      getFilteredPrice(categoryId, subcategoryId, selectPriceRange),
+    enabled: selectPriceRange !== "", // Query enabled only when a price range is selected
     staleTime: 1000 * 60 * 5,
   });
 
@@ -59,9 +64,18 @@ const CategorySort = React.memo(() => {
   });
 
   const productsArray = products?.products || [];
-  const productDetails = productsArray.filter(
-    (product) => product?.category?._id === categoryId
-  );
+  // const productDetails = productsArray.filter(
+  //   (product) => product.category && product.category._id === categoryId
+  // );
+  const productDetails = productsArray.filter((product) => {
+    return (
+      product.category &&
+      product.category._id === categoryId &&
+      (subcategoryId
+        ? product.subcategory && product.subcategory._id === subcategoryId
+        : true)
+    );
+  });
 
   const handleNavigate = (productId) => {
     navigate(`/product/${productId}`);
@@ -131,7 +145,7 @@ const CategorySort = React.memo(() => {
                                 ""
                               )}`}
                               alt="Product"
-                              className="cursor-pointer sm:h-[190px] sm:w-[250px] w-[150px] h-[170px] object-fit rounded-md"
+                              className="cursor-pointer sm:h-52 sm:w-[240px] w-[150px] h-[170px] object-cover rounded-md"
                             />
                             <button
                               onClick={(e) => toggleWishlist(product._id)}
@@ -147,9 +161,9 @@ const CategorySort = React.memo(() => {
                               />
                             </button>
                           </div>
-                          <div className="w-full flex justify-between sm:p-2 mt-2">
-                            <div className="sm:text-[16px] text-[12px] text-black">
-                              <p>{product.name}</p>
+                          <div className="w-full flex justify-between sm:p-1 mt-2">
+                            <div className="sm:text-[16px]  text-[12px] text-black">
+                              <p className="w-full ">{product.name}</p>
                               <div className="flex items-center gap-3 py-2">
                                 <Rating
                                   value={product?.averageRating}
@@ -176,7 +190,6 @@ const CategorySort = React.memo(() => {
                       ))}
                     </div>
                     {/* Pagination */}
-
                     <div className="flex justify-center mt-32 gap-2 items-center ">
                       {/* First Page Arrow */}
                       <button
@@ -227,8 +240,8 @@ const CategorySort = React.memo(() => {
                                 onClick={() => setCurrentPage(page)}
                                 className={`px-3 py-1 rounded-md ${
                                   currentPage === page
-                                    ? "bg-red-400 text-white"
-                                    : "bg-red-200 text-gray-700"
+                                    ? "bg-red-500 text-white"
+                                    : "bg-gray-200 text-gray-700"
                                 }`}
                               >
                                 {page}
@@ -273,14 +286,14 @@ const CategorySort = React.memo(() => {
                   </>
                 ) : (
                   <div className="flex items-center justify-center w-full min-h-[calc(100vh-200px)] sm:p-36 sm:pt-10 pb-20">
-                    <div className="flex flex-col items-center bg-white border border-gray-300 rounded-lg p-6 sm:p-8 shadow-lg w-full max-w-3xl text-center">
+                    <div className="flex flex-col items-center bg-white  p-6 sm:p-8  w-full max-w-3xl text-center">
                       <img
                         src="/nofound.png"
                         alt="No products found"
-                        className="w-28 h-20  sm:h-24 sm:w-32 mb-4"
+                        className="w-24 h-20 sm:w-32 sm:h-24 mb-4"
                       />
                       <p className="text-gray-800 font-semibold text-lg sm:text-xl mb-2">
-                        No Products Available for this Price Range
+                        No Products Available for products.
                       </p>
                       <p className="text-gray-500 text-sm sm:text-base mb-4">
                         We're sorry, but no products are available for this
@@ -293,9 +306,9 @@ const CategorySort = React.memo(() => {
             </div>
           </div>
         </div>
+        <ChatBox />
+        <Footer />
       </div>
-      <Footer />
-      <ChatBox />
     </div>
   );
 });

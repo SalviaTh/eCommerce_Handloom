@@ -1,7 +1,6 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { FaShoppingCart } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
-import { IoMdArrowDropdown } from "react-icons/io";
 import { GrFavorite } from "react-icons/gr";
 import { ShopContext } from "../Context/ShopContext";
 import { BsFillArchiveFill } from "react-icons/bs";
@@ -22,7 +21,22 @@ const Navbar = () => {
   const [auth, setAuth] = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
+  const sidebarRef = useRef(null);
+
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const getAllCategory = async () => {
     try {
@@ -133,7 +147,7 @@ const Navbar = () => {
 
                     <div
                       className="absolute z-[9999] hidden group-hover:block text-red-400 "
-                      style={{ marginLeft: "-90px" }}
+                      style={{ marginLeft: "-70px" }}
                     >
                       <WomenCategoryOption filteredWomen={filteredWomen} />
                     </div>
@@ -146,7 +160,7 @@ const Navbar = () => {
 
                     <div
                       className="absolute z-[9999] hidden group-hover:block  "
-                      style={{ marginLeft: "-200px" }}
+                      style={{ marginLeft: "-170px" }}
                     >
                       <CategoryOption filteredKids={filteredKids} />
                     </div>
@@ -158,7 +172,7 @@ const Navbar = () => {
 
                     <div
                       className="absolute z-[9999] hidden group-hover:block  "
-                      style={{ marginLeft: "-200px" }}
+                      style={{ marginLeft: "-240px" }}
                     >
                       <HandicraftOption
                         filteredHandicraft={filteredHandicraft}
@@ -184,8 +198,11 @@ const Navbar = () => {
 
               {/* Sidebar */}
               <div
+                ref={sidebarRef}
                 className={`fixed top-0 left-0 h-full w-64 md:w-80 lg:w-96 bg-white text-red-400 transform transition-transform duration-300 ease-in-out ${
-                  isOpen ? "translate-x-0" : "-translate-x-full"
+                  isOpen
+                    ? "translate-x-0 border border-gray-200"
+                    : "-translate-x-full"
                 }`}
               >
                 <div className="p-4">
@@ -215,24 +232,28 @@ const Navbar = () => {
                         <MenCategoryOption
                           title="MEN"
                           filteredMen={filteredMen}
+                          toggleSidebar={toggleSidebar}
                         />
                       </li>
                       <li>
                         <WomenCategoryOption
                           title="WOMEN"
                           filteredWomen={filteredWomen}
+                          toggleSidebar={toggleSidebar}
                         />
                       </li>
                       <li>
                         <CategoryOption
                           title="KIDS"
                           filteredKids={filteredKids}
+                          toggleSidebar={toggleSidebar}
                         />
                       </li>
                       <li>
                         <HandicraftOption
                           title="HANDICRAFT"
                           filteredHandicraft={filteredHandicraft}
+                          toggleSidebar={toggleSidebar}
                         />
                       </li>
                       <li>
@@ -262,7 +283,7 @@ const Navbar = () => {
                           <span>Orders</span>
                         </NavLink>
                         <NavLink
-                          to="/sellerlogin"
+                          to="/sellOn"
                           className="flex items-center space-x-2 p-2 rounded-md hover:bg-red-300"
                         >
                           <BsFillBoxFill size={20} />
@@ -311,13 +332,66 @@ const Navbar = () => {
                   </Tooltip>
                   {/* )} */}
                   {/* {!auth.token ? ( */}
-                  <Tooltip label="Login" className="bg-red-500">
-                    <NavLink to="/login" type="button" className="relative p-2">
-                      <button type="button">
-                        <Avatar src={null} alt="no image here" color="red" />
+
+                  <div className="relative group">
+                    <NavLink to="/login" className="relative p-2">
+                      <button type="button" className="focus:outline-none">
+                        <Avatar src={null} alt="User Avatar" color="red" />
                       </button>
                     </NavLink>
-                  </Tooltip>
+
+                    {/* Dropdown Menu */}
+                    <div className="absolute left-1/2 transform -translate-x-1/2  w-60 lg:w-72 xl:w-80 bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 group-hover:block transition-opacity duration-300 hidden z-10">
+                      <div className="p-4">
+                        <NavLink
+                          to="/login"
+                          className="ml-24 mt-8 bg-red-500  hover:underline text-white  p-2 rounded-lg font-medium transition duration-300"
+                        >
+                          Your Account
+                        </NavLink>
+                        <p className="text-[14px] mt-2 pl-12">
+                          New customer?
+                          <NavLink
+                            to="/signup"
+                            className="underline text-blue-500"
+                          >
+                            {" "}
+                            Start here.
+                          </NavLink>
+                        </p>
+                        <NavLink
+                          to="/myorder"
+                          className="block text-gray-700 hover:bg-gray-100 p-2 rounded-lg font-medium transition duration-300"
+                        >
+                          Your Orders
+                        </NavLink>
+                        <NavLink
+                          to="/wishlist"
+                          className="block text-gray-700 hover:bg-gray-100 p-2 rounded-lg font-medium transition duration-300"
+                        >
+                          Your Wish List
+                        </NavLink>
+                        <NavLink
+                          to="/"
+                          className="block text-gray-700 hover:bg-gray-100 p-2 rounded-lg font-medium transition duration-300"
+                        >
+                          Your Recommendations
+                        </NavLink>
+                        <NavLink
+                          to="/sellOn"
+                          className="block text-gray-700 hover:bg-gray-100 p-2 rounded-lg font-medium transition duration-300"
+                        >
+                          Your Seller Account
+                        </NavLink>
+                        <NavLink
+                          to="/privacypolicy"
+                          className="block text-gray-700 hover:bg-gray-100 p-2 rounded-lg font-medium transition duration-300"
+                        >
+                          Manage Your Content and Devices
+                        </NavLink>
+                      </div>
+                    </div>
+                  </div>
                   {/* ) : ( */}
                   {/* <button
                       type="button"
@@ -333,11 +407,11 @@ const Navbar = () => {
                       Logout
                     </button>
                   )} */}
-                  <NavLink to="/sellerlogin">
+                  <NavLink to="/sellOn">
                     <Button
                       className="text-white px-2 py-[-2px]  "
                       variant="filled"
-                      color="red"
+                      color="green"
                     >
                       <BsFillBoxFill className="m-1" />
                       Seller

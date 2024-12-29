@@ -74,7 +74,7 @@ const SearchBar = () => {
       />
 
       {searchProduct && filteredProducts.length > 0 && (
-        <div className="dropdown">
+        <div className="dropdown mt-2">
           {filteredProducts.map((product) => (
             // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
             <div

@@ -77,8 +77,8 @@ const SignIn = () => {
             type="submit"
             className={`w-full bg-red-400 text-white p-1 h-8 sm:text-[15px] text-[12px] rounded-md hover:bg-red-500 transition duration-300 font-semibold ${
               loading ? "opacity-50 cursor-not-allowed" : ""
-            }`} // Disable button during loading
-            disabled={loading} // Disable button during loading
+            }`}
+            disabled={loading}
           >
             {loading ? "Loading..." : "Continue"}{" "}
             {/* Change button text during loading */}
@@ -93,7 +93,7 @@ const SignIn = () => {
           </p>
           <p className="text-center text-gray-600 text-[12px]">
             New to Eyongkart?{" "}
-            <Link to="/signup" className="text-blue-500">
+            <Link to="/signup" className="text-red-500">
               Create your Eyongkart account
             </Link>
           </p>

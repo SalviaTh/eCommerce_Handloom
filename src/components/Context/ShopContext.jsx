@@ -38,63 +38,47 @@ const ShopContextProvider = (props) => {
   useEffect(() => {
     fetchProducts();
   }, []);
-
   const addToCart = (itemId) => {
-    console.log("addToCart function");
-    console.log(itemId);
-
-    // Find the item data by itemId
-    const addData = data.find((data) => data._id === itemId);
-
-    // Update the cartItems state by adding the new item
-    setCartItems((prev) => {
-      // Check if the item is already in the cart
-      const existingItem = prev.find((item) => item._id === itemId);
-
-      let updatedCartItems;
-      if (existingItem) {
-        // If the item is already in the cart, update its quantity and subtotal
-        updatedCartItems = prev.map((item) =>
-          item._id === itemId
-            ? {
-                ...item,
-                quantity: item.quantity + 1,
-                subtotal: (item.quantity + 1) * item.discountedPrice,
-              }
-            : item
-        );
-      } else {
-        // If the item is not in the cart, add it with a quantity of 1 and calculate the subtotal
-        updatedCartItems = [
-          ...prev,
-          { ...addData, quantity: 1, subtotal: addData.discountedPrice },
-        ];
-      }
-
-      // Store the updated cartItems in localStorage
-      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
-
-      return updatedCartItems;
-    });
+    if (data) {
+      const addData = data.find((item) => item._id === itemId); // Find item in product data
+      setCartItems((prev) => {
+        const existingItem = prev.find((item) => item._id === itemId); // Check if item already exists in the cart
+        let updatedCartItems;
+        if (existingItem) {
+          // Update quantity and subtotal if item already exists
+          updatedCartItems = prev.map((item) =>
+            item._id === itemId
+              ? {
+                  ...item,
+                  quantity: item.quantity + 1,
+                  subtotal: (item.quantity + 1) * item.discountedPrice,
+                }
+              : item
+          );
+        } else {
+          // Add new item to cart with initial quantity and subtotal
+          updatedCartItems = [
+            ...prev,
+            { ...addData, quantity: 1, subtotal: addData.discountedPrice },
+          ];
+        }
+        // Save updated cart to localStorage
+        localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+        return updatedCartItems;
+      });
+    }
   };
-
   const substractQuantity = (itemId) => {
     setCartItems((prev) => {
-      // Find the item in the cart
-      let updatedCartItems;
-      const item = prev.find((item) => item._id === itemId);
-      if (item) {
-        // If the item is already in the cart, update its quantity and subtotal
-        updatedCartItems = prev.map((item) =>
-          item._id === itemId && item.quantity > 0
-            ? {
-                ...item,
-                quantity: item.quantity - 1,
-                subtotal: (item.quantity - 1) * item.discountedPrice,
-              }
-            : item
-        );
-      }
+      const updatedCartItems = prev.map((item) =>
+        item._id === itemId && item.quantity > 0
+          ? {
+              ...item,
+              quantity: item.quantity - 1,
+              subtotal: (item.quantity - 1) * item.discountedPrice,
+            }
+          : item
+      );
       return updatedCartItems;
     });
   };

@@ -17,11 +17,14 @@ const Checkout = () => {
   const [fullname, setFullName] = useState("");
   const [address, setAddress] = useState("");
   const [phonenumber, setPhoneNumber] = useState("");
-  const [email, setEmail] = useState("");
+  // const [email, setEmail] = useState("");
   const [district, setDistrict] = useState("");
   const [pincode, setPincode] = useState("");
   const [state, setState] = useState("Manipur");
   const [checkoutItem, setCheckoutItem] = useState([]);
+
+  const [isAddressSubmitted, setIsAddressSubmitted] = useState(false); // Check if address is submitted
+
   const districtPincode = [
     {
       district: "Imphal East",
@@ -56,18 +59,55 @@ const Checkout = () => {
       behavior: "smooth",
     });
   }, []);
-  
+
   useEffect(() => {
     localStorage.setItem("checkoutItem", JSON.stringify(cartItems));
   }, [cartItems]);
   
   useEffect(() => {
-    console.log(district);
-    const pincode = districtPincode.filter(
-      (eachDistrict) => eachDistrict.district === district
-    );
-    setPincode(pincode[0]?.pincode);
+    const savedAddress = localStorage.getItem("addressInfo");
+    if (savedAddress) {
+      const addressData = JSON.parse(savedAddress);
+      setFullName(addressData.fullname);
+      setAddress(addressData.address);
+      setPhoneNumber(addressData.phoneNumber);
+      // setEmail(addressData.email);
+      setDistrict(addressData.district);
+      setPincode(addressData.pincode);
+      setState(addressData.state);
+      setIsAddressSubmitted(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const pincodeData = districtPincode.find((d) => d.district === district);
+    setPincode(pincodeData?.pincode || "");
   }, [district]);
+
+  const saveAddress = () => {
+    const addressData = {
+      fullname,
+      address,
+      phoneNumber: phonenumber,
+      // email,
+      district,
+      pincode,
+      state,
+    };
+    localStorage.setItem("addressInfo", JSON.stringify(addressData));
+    setIsAddressSubmitted(true); // Address is saved
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Your address has been saved",
+      showConfirmButton: true,
+      timer: 1500,
+    });
+  };
+
+  const handleEditAddress = () => {
+    setIsAddressSubmitted(false); // Allow the user to edit address
+  };
 
   function loadScript(src) {
     return new Promise((resolve) => {
@@ -93,14 +133,12 @@ const Checkout = () => {
     }
 
     if (paymentMethod === "razorpay") {
+      // navigate("/razorpay-payment");
       // console.log("Proceed with Razorpay payment");
       navigate("/razorpay-payment");
     }
     if (paymentMethod === "cash") {
-      // setTimeout(() => {
       alertOk();
-      // navigate("/myorder");
-      // }, 1000);
     }
 
     const res = await loadScript(
@@ -187,6 +225,22 @@ const Checkout = () => {
     rzp1.open();
   };
 
+  // const getTotal = () => {
+  //   let total = 0;
+  //   if (checkoutItem && checkoutItem?.length) {
+  //     checkoutItem.map((i) => {
+  //       total = total + i.discountedPrice;
+  //     });
+  //   }
+  //   return total;
+  // };
+  // const getTotal = () => {
+  //   let total = 0;
+  //   cartItems?.forEach((i) => {
+  //     total += i.discountedPrice;
+  //   });
+  //   return total;
+  // };
   const getTotal = () => {
     let total = 0;
     if (checkoutItem && checkoutItem?.length) {
@@ -196,7 +250,8 @@ const Checkout = () => {
     }
     return total;
   };
-
+  // console.log("cartItems:", cartItems);
+  // console.log("checkoutItems:", checkoutItem);
   useEffect(() => {
     let isData = localStorage.getItem("checkoutItem");
     if (isData) {
@@ -382,8 +437,47 @@ const Checkout = () => {
           <div className="container mb-4 w-full  mt-4 sm:w-[48%]  p-4 border  border-gray-300 drop-shadow-lg rounded-lg">
             <h1 className="text-[16px] sm:text-[18px]">Cart Totals</h1>
             <div>
-              {checkoutItem ? (
+              {checkoutItem?.length > 0 ? (
                 <>
+                  {/* Render Cart Items */}
+                  {checkoutItem?.map((p, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center border border-gray-300 rounded-lg gap-2 mb-3"
+                    >
+                      <p className="p-1">
+                        <img
+                          className="h-[80px] sm:h-[100px] w-[80px] sm:w-[100px] object-cover"
+                          src={`${
+                            CloudinaryConfig.CLOUDINARY_URL
+                          }/image/upload/${p?.image_id[0]?.replace(/"/g, "")}`}
+                          alt="product"
+                        />
+                      </p>
+                      <p className="p-2 sm:text-[16px] text-[14px]">{p.name}</p>
+                      <p className="p-2 sm:text-[16px] text-[14px]">
+                        ₹ {p.discountedPrice}
+                      </p>
+                    </div>
+                  ))}
+                  <div className="flex justify-between sm:text-[16px] text-[14px] pt-[-15px]">
+                    <p>Subtotals</p>
+                    <p>₹ {getTotal()}</p>
+                  </div>
+                  <hr className="h-[1px] bg-gray-300 border-none" />
+                  <div className="flex justify-between sm:text-[16px] text-[14px]">
+                    <p>Shipping Fee</p>
+                    <p>Free</p>
+                  </div>
+                  <hr className="h-[1px] bg-gray-300 border-none" />
+                  <div className="flex justify-between sm:text-[16px] text-[14px] pt-[-15px]">
+                    <h3>Totals</h3>
+                    <h3>₹ {getTotal()}</h3>
+                  </div>
+                </>
+              ) : checkoutItem?.length > 0 ? (
+                <>
+                  {/* Render Checkout Items */}
                   {checkoutItem.map((p, i) => (
                     <div
                       key={i}
@@ -422,6 +516,7 @@ const Checkout = () => {
               ) : (
                 <></>
               )}
+
               <Radio.Group>
                 <Group mt="xl">
                   <Radio
